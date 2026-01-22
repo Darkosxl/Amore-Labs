@@ -6,15 +6,6 @@ const navItems = [
   'Integrations'
 ]
 
-const workflowSteps = [
-  { step: '01', title: 'The Trigger', description: 'D&S reviews retailer In-Stock measures' },
-  { step: '02', title: 'Referral', description: 'Route requirements to CSC' },
-  { step: '03', title: 'The Pitch', description: 'AI proposes offers to maximize fulfillment' },
-  { step: '04', title: 'The Counter', description: 'Retailer responses reviewed by CSC' },
-  { step: '05', title: 'Execution', description: 'Automated RFX & PO generation' },
-  { step: '06', title: 'Visibility', description: 'Real-time sync of Reason Codes' }
-]
-
 const failureCards = [
   {
     title: 'Customer Order Fulfillment',
@@ -47,8 +38,7 @@ const failureCards = [
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-20">
           <div class="flex-shrink-0 flex items-center">
-             <!-- Using text logo to match previous clean style, or existing image if present -->
-             <span class="font-bold text-xl tracking-tight">OTIF<span class="text-blue-600">.AI</span></span>
+             <img src="/amore-labs-logo.png" alt="Amore Labs" class="h-8 w-auto" />
           </div>
 
           <nav class="hidden md:flex space-x-8">
@@ -67,7 +57,7 @@ const failureCards = [
               Hear a Demo
             </a>
             <button class="bg-black text-white px-5 py-2.5 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors">
-              Deploy Agents
+              Deploy Adversarial Agents
             </button>
           </div>
         </div>
@@ -83,32 +73,138 @@ const failureCards = [
 
         <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-gray-900 mb-6">
           Protect Your 98% OTIF Scorecard<br class="hidden sm:block" />
-          with Adversarial Voice Agents
+          with Adversarial Agents
         </h1>
 
         <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto mb-10">
-          Don't just accept the fine. When production lines break, our AI negotiates substitutions, prevents on-shelf gaps, and secures Best-in-Class status before the truck leaves.
+          Don't just accept the fine. When production lines break, our Adversarial Agent negotiates substitutions, prevents on-shelf gaps, and secures Best-in-Class status before the truck leaves.
         </p>
 
         <div class="flex justify-center">
           <button class="bg-gray-900 text-white px-8 py-3 rounded-md text-base font-medium hover:bg-gray-800 transition-colors">
-            Deploy Agents
+            Deploy Adversarial Agents
           </button>
         </div>
       </div>
 
       <!-- Live Action Workflow -->
-      <section class="py-20 border-t border-gray-100">
-        <h2 class="text-center text-xs font-bold text-gray-400 uppercase tracking-widest mb-16">Live Action Workflow</h2>
+      <section class="py-24 bg-white border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center mb-20">
+            <h2 class="text-4xl font-bold text-gray-900 mb-6">How Amore Labs Transforms Supply Chain</h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Enterprise-grade automation with zero training required.</p>
+          </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-6 gap-8 text-center">
-          <div v-for="(item, index) in workflowSteps" :key="index" class="relative">
-             <div class="text-xs font-mono text-gray-400 mb-2">{{ item.step }}</div>
-             <div class="w-12 h-12 mx-auto bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-100">
-               <span class="text-xl">↓</span>
-             </div>
-             <h3 class="text-sm font-bold text-gray-900 mb-1">{{ item.title }}</h3>
-             <p class="text-xs text-gray-500 px-2">{{ item.description }}</p>
+          <div class="relative max-w-6xl mx-auto">
+            <!-- Desktop Arrows (Absolute Positioned) -->
+            <div class="hidden md:block absolute inset-0 pointer-events-none">
+              <!-- Arrow 1 to 2 -->
+              <svg class="absolute top-[80px] left-[22%] w-[12%] h-8 text-gray-300" viewBox="0 0 100 20" preserveAspectRatio="none">
+                <path d="M0,10 L95,10" stroke="currentColor" stroke-width="2" fill="none" />
+                <path d="M90,5 L100,10 L90,15" fill="currentColor" />
+              </svg>
+              <!-- Arrow 2 to 3 -->
+              <svg class="absolute top-[80px] right-[22%] w-[12%] h-8 text-gray-300" viewBox="0 0 100 20" preserveAspectRatio="none">
+                <path d="M0,10 L95,10" stroke="currentColor" stroke-width="2" fill="none" />
+                <path d="M90,5 L100,10 L90,15" fill="currentColor" />
+              </svg>
+              <!-- Arrow 3 to 4 (Down) -->
+              <svg class="absolute top-[160px] right-[16%] w-8 h-[100px] text-gray-300" viewBox="0 0 20 100" preserveAspectRatio="none">
+                <path d="M10,0 L10,95" stroke="currentColor" stroke-width="2" fill="none" />
+                <path d="M5,90 L10,100 L15,90" fill="currentColor" />
+              </svg>
+              <!-- Arrow 4 to 5 (Left) -->
+              <svg class="absolute bottom-[100px] right-[22%] w-[12%] h-8 text-gray-300" viewBox="0 0 100 20" preserveAspectRatio="none">
+                <path d="M100,10 L5,10" stroke="currentColor" stroke-width="2" fill="none" />
+                <path d="M10,5 L0,10 L10,15" fill="currentColor" />
+              </svg>
+              <!-- Arrow 5 to 6 (Left) -->
+              <svg class="absolute bottom-[100px] left-[22%] w-[12%] h-8 text-gray-300" viewBox="0 0 100 20" preserveAspectRatio="none">
+                <path d="M100,10 L5,10" stroke="currentColor" stroke-width="2" fill="none" />
+                <path d="M10,5 L0,10 L10,15" fill="currentColor" />
+              </svg>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-y-24 gap-x-12 relative z-10">
+              <!-- Step 1 -->
+              <div class="flex flex-col items-center text-center">
+                <div class="w-24 h-24 bg-blue-50 border border-blue-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
+                  <svg class="w-10 h-10 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <div class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">Step 1</div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">The Trigger</h3>
+                <p class="text-sm text-gray-600 leading-relaxed max-w-xs">D&S reviews retailer In-Stock measures and detects stockouts.</p>
+              </div>
+
+              <!-- Step 2 -->
+              <div class="flex flex-col items-center text-center">
+                <div class="w-24 h-24 bg-purple-50 border border-purple-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
+                  <svg class="w-10 h-10 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <div class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">Step 2</div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Referral</h3>
+                <p class="text-sm text-gray-600 leading-relaxed max-w-xs">Route requirements to CSC Adversarial Agents.</p>
+              </div>
+
+              <!-- Step 3 -->
+              <div class="flex flex-col items-center text-center">
+                <div class="w-24 h-24 bg-orange-50 border border-orange-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
+                  <svg class="w-10 h-10 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                  </svg>
+                </div>
+                <div class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">Step 3</div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">The Pitch</h3>
+                <p class="text-sm text-gray-600 leading-relaxed max-w-xs">Adversarial Agent proposes offers to maximize fulfillment.</p>
+              </div>
+
+              <!-- Step 6 (Visual position: bottom-left, but logically last. Grid order trick not needed if we just place Step 6 here?
+                   NO, grid flows row-by-row.
+                   Row 1: Step 1, Step 2, Step 3
+                   Row 2: Step 6, Step 5, Step 4 (REVERSE)
+              -->
+
+              <!-- Step 6 (Placed in DOM first for Row 2 Col 1) -->
+              <div class="flex flex-col items-center text-center">
+                <div class="w-24 h-24 bg-indigo-50 border border-indigo-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
+                   <svg class="w-10 h-10 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+                   </svg>
+                </div>
+                <div class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">Step 6</div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Visibility</h3>
+                <p class="text-sm text-gray-600 leading-relaxed max-w-xs">Real-time sync of Reason Codes and delivery status.</p>
+              </div>
+
+              <!-- Step 5 -->
+              <div class="flex flex-col items-center text-center">
+                <div class="w-24 h-24 bg-green-50 border border-green-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
+                  <svg class="w-10 h-10 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <div class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">Step 5</div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Execution</h3>
+                <p class="text-sm text-gray-600 leading-relaxed max-w-xs">Automated RFX & PO generation.</p>
+              </div>
+
+              <!-- Step 4 -->
+              <div class="flex flex-col items-center text-center">
+                <div class="w-24 h-24 bg-yellow-50 border border-yellow-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
+                   <svg class="w-10 h-10 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                   </svg>
+                </div>
+                <div class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">Step 4</div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">The Counter</h3>
+                <p class="text-sm text-gray-600 leading-relaxed max-w-xs">Retailer responses reviewed by CSC.</p>
+              </div>
+
+            </div>
           </div>
         </div>
       </section>
@@ -117,7 +213,7 @@ const failureCards = [
       <section class="py-20 border-t border-gray-100">
         <div class="text-center mb-16">
           <h2 class="text-3xl font-bold text-gray-900 mb-4">Three Views of Failure</h2>
-          <p class="text-gray-600">Why the AI is a strategic necessity.</p>
+          <p class="text-gray-600">Why the Adversarial Agent is a strategic necessity.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -181,14 +277,14 @@ const failureCards = [
           <div class="bg-gray-50 rounded-xl border border-gray-200 p-6 flex flex-col h-full">
             <div class="flex-1 space-y-4">
                <div class="flex items-start space-x-3">
-                 <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold">AI</div>
+                 <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold">AA</div>
                  <div class="bg-white p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl shadow-sm text-sm text-gray-700">
                    Connecting to Retailer Buyer...
                  </div>
                </div>
 
                <div class="flex items-start space-x-3">
-                 <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold">AI</div>
+                 <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold">AA</div>
                  <div class="bg-white p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl shadow-sm text-sm text-gray-700">
                    We are short on 500g jars. To prevent empty shelves, we propose substituting with 500 cases of 1kg Family Packs.
                  </div>
@@ -242,13 +338,16 @@ const failureCards = [
     <!-- Footer -->
     <footer class="bg-white border-t border-gray-100 py-12">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
-        <div class="mb-4 md:mb-0 font-bold text-gray-900">OTIF<span class="text-blue-600">.AI</span></div>
+        <div class="mb-4 md:mb-0 flex items-center">
+          <img src="/amore-labs-logo.png" alt="Amore Labs" class="h-6 w-auto mr-2" />
+          <span class="font-bold text-gray-900">Amore Labs</span>
+        </div>
         <div class="flex space-x-8 text-sm text-gray-500">
           <a href="#" class="hover:text-gray-900">Joint Business Planning</a>
           <a href="#" class="hover:text-gray-900">Privacy</a>
           <a href="#" class="hover:text-gray-900">Contact D&S Planning</a>
         </div>
-        <div class="mt-4 md:mt-0 text-sm text-gray-400">© 2026 OTIF AI Agents.</div>
+        <div class="mt-4 md:mt-0 text-sm text-gray-400">© 2026 Amore Labs Inc.</div>
       </div>
     </footer>
   </div>
