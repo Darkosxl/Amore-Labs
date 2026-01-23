@@ -8,16 +8,17 @@
     <div class="absolute top-0 left-0 w-[500px] h-[500px] bg-blue-50/50 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-stretch">
 
         <!-- Left Side: Dark UI Mockup Visual -->
         <div class="relative group">
            <!-- Card Container -->
-           <div class="relative bg-slate-900 rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-800 overflow-hidden min-h-[400px]">
+           <div class="relative rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-800 overflow-hidden h-full flex flex-col justify-center"
+                style="background: radial-gradient(circle at 0% 0%, #000000, #505050, #000000), linear-gradient(180deg, #a6a1a1, #000000); background-blend-mode: overlay, normal;">
 
               <!-- Background Grid -->
               <div class="absolute inset-0 opacity-20"
-                   style="background-image: radial-gradient(#4b5563 1px, transparent 1px); background-size: 24px 24px;">
+                   style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 24px 24px;">
               </div>
 
               <!-- Header -->
@@ -91,7 +92,7 @@
           <p class="text-blue-600 font-bold uppercase tracking-widest text-xs mb-4">
              Manufacturing Specialized
           </p>
-          <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+          <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tighter">
             Powering<br/> Manufacturing<br/> Supply Chains
           </h2>
           <p class="text-lg text-gray-600 mb-10 leading-relaxed">

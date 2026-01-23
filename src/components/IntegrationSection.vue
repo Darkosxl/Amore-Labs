@@ -28,14 +28,15 @@ const conversation = [
 <template>
   <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <!-- Main Dark Container -->
-    <div class="bg-slate-900 rounded-3xl p-8 md:p-12 overflow-hidden relative shadow-2xl">
+    <div class="rounded-3xl p-8 md:p-12 overflow-hidden relative shadow-2xl"
+         style="background: radial-gradient(circle at 0% 0%, #000000, #505050, #000000), linear-gradient(180deg, #a6a1a1, #000000); background-blend-mode: overlay, normal;">
       <!-- Background Effects (Gradient/Glow) - Monochrome -->
       <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
       <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 bg-gray-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
       <!-- Header Section -->
       <div class="flex flex-col md:flex-row justify-between items-center mb-12 relative z-10">
-        <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 md:mb-0">
+        <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 md:mb-0 tracking-tighter">
           Seamless ERP Integration
         </h2>
 

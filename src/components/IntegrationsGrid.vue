@@ -22,7 +22,8 @@ const octagonalClip = "polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30%
 </script>
 
 <template>
-  <section class="max-w-7xl mx-auto my-20 px-6 grid md:grid-cols-2 gap-16 items-center border border-slate-800 bg-slate-900 p-10 rounded-3xl relative overflow-hidden">
+  <section class="max-w-7xl mx-auto my-20 px-6 grid md:grid-cols-2 gap-16 items-center border border-slate-800 p-10 rounded-3xl relative overflow-hidden"
+           style="background: radial-gradient(circle at 0% 0%, #000000, #505050, #000000), linear-gradient(180deg, #a6a1a1, #000000); background-blend-mode: overlay, normal;">
     <!-- Background Glow -->
     <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-blue-900/10 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -31,8 +32,8 @@ const octagonalClip = "polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30%
       <p class="uppercase text-xs font-bold tracking-widest text-blue-400 mb-3">
         Ecosystem
       </p>
-      <h2 class="text-5xl font-bold mb-6 text-white leading-tight">
-        Unify Your<br/> Supply Chain
+      <h2 class="text-5xl font-bold mb-6 text-white leading-tight tracking-tighter">
+        Cooperates With Your<br/> Supply Chain Stack
       </h2>
       <p class="text-slate-400 mb-8 text-lg leading-relaxed">
         Connect to SAP, Oracle, NetSuite, and your entire stack.

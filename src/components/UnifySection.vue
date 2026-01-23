@@ -9,9 +9,9 @@
 
         <!-- Left Column: Copy -->
         <div class="space-y-8">
-          <h2 class="text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight">
-            Unify Your<br />
-            Supply Chain<br />
+          <h2 class="text-4xl md:text-5xl font-bold text-white tracking-tighter leading-tight">
+            Cooperates with <br />
+            your existing supply chain stack<br />
             Systems and<br />
             Data. Safely.
           </h2>
