@@ -7,8 +7,9 @@ const navItems = [
 ]
 
 import IntegrationSection from './IntegrationSection.vue'
-import IntegrationsGrid from './IntegrationsGrid.vue' // Unify your supply chain section
+import IntegrationsGrid from './IntegrationsGrid.vue'
 import BookingModal from './BookingModal.vue'
+import ManufacturingPowerSection from './ManufacturingPowerSection.vue' // New Section
 import { ref } from 'vue'
 
 const showBooking = ref(false)
@@ -43,12 +44,9 @@ const failureCards = [
     <!-- Navbar -->
     <header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-sm border-b border-gray-100">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-20">
-          <div class="flex-shrink-0 flex items-center">
-             <img src="/amore-labs-logo.png" alt="Amore Labs" class="h-8 w-auto" />
-          </div>
-
-          <nav class="hidden md:flex space-x-8">
+        <div class="relative flex justify-between items-center h-20">
+          <!-- Left: Nav Links -->
+          <nav class="hidden md:flex space-x-8 z-10">
             <a
               v-for="item in navItems"
               :key="item"
@@ -59,7 +57,13 @@ const failureCards = [
             </a>
           </nav>
 
-          <div class="flex items-center space-x-4">
+          <!-- Center: Logo -->
+          <div class="absolute left-1/2 transform -translate-x-1/2 flex items-center">
+             <img src="/amore-labs-logo.png" alt="Amore Labs" class="h-12 w-auto" />
+          </div>
+
+          <!-- Right: Button -->
+          <div class="flex items-center space-x-4 z-10">
             <button @click="showBooking = true" class="bg-black text-white px-5 py-2.5 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors">
               Request Demo
             </button>
@@ -71,9 +75,6 @@ const failureCards = [
     <!-- Hero Section -->
     <main class="pt-32 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <div class="text-center mb-24">
-        <div class="inline-flex items-center space-x-2 bg-red-50 px-3 py-1 rounded-full mb-8 border border-red-100">
-           <span class="text-red-600 text-xs font-bold tracking-wider uppercase">Avoid the 3% COGS Non-Compliance Fine</span>
-        </div>
 
         <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-gray-00 mb-6">
          Adversarial Coordinator Agents<br class="hidden sm:block" />
@@ -95,6 +96,9 @@ const failureCards = [
 
       <!-- Integrations Grid (Octagonal Logos) -->
       <IntegrationsGrid @openBooking="showBooking = true" />
+
+      <!-- Manufacturing Power Section (New - moved below) -->
+      <ManufacturingPowerSection />
 
       <!-- Live Action Workflow (Redesigned) -->
       <section class="py-24 bg-white border-t border-gray-100">
@@ -352,7 +356,7 @@ const failureCards = [
     <footer class="bg-white border-t border-gray-100 py-12">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
         <div class="mb-4 md:mb-0 flex items-center">
-          <img src="/amore-labs-logo.png" alt="Amore Labs" class="h-6 w-auto mr-2" />
+          <img src="/amore-labs-logo.png" alt="Amore Labs" class="h-8 w-auto mr-2" />
           <span class="font-bold text-gray-900">Amore Labs</span>
         </div>
         <div class="flex space-x-8 text-sm text-gray-500">
