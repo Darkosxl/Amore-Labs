@@ -6,7 +6,12 @@ const navItems = [
   'Integrations'
 ]
 
-import IntegrationSection from './IntegrationSection.vue' // Import the new component
+import IntegrationSection from './IntegrationSection.vue'
+import IntegrationsGrid from './IntegrationsGrid.vue' // Unify your supply chain section
+import BookingModal from './BookingModal.vue'
+import { ref } from 'vue'
+
+const showBooking = ref(false)
 
 const failureCards = [
   {
@@ -55,11 +60,8 @@ const failureCards = [
           </nav>
 
           <div class="flex items-center space-x-4">
-            <a href="#" class="text-sm font-medium text-gray-500 hover:text-gray-900">
-              Hear a Demo
-            </a>
-            <button class="bg-black text-white px-5 py-2.5 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors">
-              Deploy Adversarial Agents
+            <button @click="showBooking = true" class="bg-black text-white px-5 py-2.5 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors">
+              Request Demo
             </button>
           </div>
         </div>
@@ -82,8 +84,8 @@ const failureCards = [
         </p>
 
         <div class="flex justify-center">
-          <button class="bg-gray-900 text-white px-8 py-3 rounded-md text-base font-medium hover:bg-gray-800 transition-colors">
-            Deploy Adversarial Agents
+          <button @click="showBooking = true" class="bg-gray-900 text-white px-8 py-3 rounded-md text-base font-medium hover:bg-gray-800 transition-colors">
+            Talk to Founders
           </button>
         </div>
       </div>
@@ -91,122 +93,126 @@ const failureCards = [
       <!-- Integration Section (Recreated from Image) -->
       <IntegrationSection />
 
-      <!-- Live Action Workflow -->
+      <!-- Integrations Grid (Octagonal Logos) -->
+      <IntegrationsGrid @openBooking="showBooking = true" />
+
+      <!-- Live Action Workflow (Redesigned) -->
       <section class="py-24 bg-white border-t border-gray-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="text-center mb-20">
+          <div class="text-center mb-24">
             <h2 class="text-4xl font-bold text-gray-900 mb-6">How Amore Labs Transforms Supply Chain</h2>
             <p class="text-lg text-gray-600 max-w-2xl mx-auto">Enterprise-grade automation with zero training required.</p>
           </div>
 
-          <div class="relative max-w-6xl mx-auto">
-            <!-- Desktop Arrows (Absolute Positioned) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-y-24 gap-x-12 relative z-10">
-              <!-- Step 1 -->
-              <div class="flex flex-col items-center text-center relative group">
-                <!-- Arrow 1 to 2 -->
-                <svg class="hidden md:block absolute top-12 -right-16 w-24 h-6 text-gray-300 z-0" viewBox="0 0 100 20" preserveAspectRatio="none">
-                  <path d="M0,10 L95,10" stroke="currentColor" stroke-width="3" fill="none" />
-                  <path d="M90,5 L100,10 L90,15" fill="currentColor" />
-                </svg>
+          <div class="max-w-6xl mx-auto">
+            <!-- Grid Container -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-y-24 gap-x-12 relative">
 
-                <div class="w-24 h-24 bg-blue-50 border border-blue-100 rounded-full flex items-center justify-center mb-6 shadow-sm relative z-10">
-                  <!-- Envelope Icon -->
-                  <svg class="w-10 h-10 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <!-- STEP 1 -->
+              <div class="flex flex-col items-center text-center relative group">
+                <!-- Arrow 1 -> 2 (Right) -->
+                <div class="hidden md:block absolute top-10 -right-[4.5rem] w-16 text-gray-300">
+                  <svg viewBox="0 0 24 24" fill="none" class="w-full h-6" stroke="currentColor" stroke-width="2">
+                     <path d="M5 12h14M15 8l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+
+                <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6 shadow-sm ring-1 ring-blue-100">
+                  <svg class="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <div class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">Step 1</div>
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Step 1</div>
                 <h3 class="text-xl font-bold text-gray-900 mb-3">The Trigger</h3>
                 <p class="text-sm text-gray-600 leading-relaxed max-w-xs">D&S reviews retailer In-Stock measures and detects stockouts.</p>
               </div>
 
-              <!-- Step 2 -->
+              <!-- STEP 2 -->
               <div class="flex flex-col items-center text-center relative group">
-                <!-- Arrow 2 to 3 -->
-                <svg class="hidden md:block absolute top-12 -right-16 w-24 h-6 text-gray-300 z-0" viewBox="0 0 100 20" preserveAspectRatio="none">
-                  <path d="M0,10 L95,10" stroke="currentColor" stroke-width="3" fill="none" />
-                  <path d="M90,5 L100,10 L90,15" fill="currentColor" />
-                </svg>
+                <!-- Arrow 2 -> 3 (Right) -->
+                 <div class="hidden md:block absolute top-10 -right-[4.5rem] w-16 text-gray-300">
+                  <svg viewBox="0 0 24 24" fill="none" class="w-full h-6" stroke="currentColor" stroke-width="2">
+                     <path d="M5 12h14M15 8l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
 
-                <div class="w-24 h-24 bg-purple-50 border border-purple-100 rounded-full flex items-center justify-center mb-6 shadow-sm relative z-10">
-                  <!-- Brain Icon -->
-                  <svg class="w-10 h-10 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="w-20 h-20 bg-purple-50 rounded-full flex items-center justify-center mb-6 shadow-sm ring-1 ring-purple-100">
+                  <svg class="w-8 h-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
                 </div>
-                <div class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">Step 2</div>
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Step 2</div>
                 <h3 class="text-xl font-bold text-gray-900 mb-3">Referral</h3>
                 <p class="text-sm text-gray-600 leading-relaxed max-w-xs">Route requirements to CSC Adversarial Agents.</p>
               </div>
 
-              <!-- Step 3 -->
+              <!-- STEP 3 -->
               <div class="flex flex-col items-center text-center relative group">
-                <!-- Arrow 3 to 4 (Down) -->
-                <svg class="hidden md:block absolute -bottom-16 left-1/2 -translate-x-1/2 w-8 h-20 text-gray-300 z-0" viewBox="0 0 20 100" preserveAspectRatio="none">
-                   <path d="M10,0 L10,95" stroke="currentColor" stroke-width="3" fill="none" />
-                   <path d="M5,90 L10,100 L15,90" fill="currentColor" />
-                </svg>
+                <!-- Arrow 3 -> 4 (Down) -->
+                <div class="hidden md:block absolute -bottom-16 left-1/2 -translate-x-1/2 h-16 text-gray-300">
+                   <svg viewBox="0 0 24 24" fill="none" class="h-full w-6" stroke="currentColor" stroke-width="2">
+                     <path d="M12 5v14M8 15l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
 
-                <div class="w-24 h-24 bg-orange-50 border border-orange-100 rounded-full flex items-center justify-center mb-6 shadow-sm relative z-10">
-                   <!-- Routing / Git Merge Icon -->
-                  <svg class="w-10 h-10 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mb-6 shadow-sm ring-1 ring-orange-100">
+                  <svg class="w-8 h-8 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                   </svg>
                 </div>
-                <div class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">Step 3</div>
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Step 3</div>
                 <h3 class="text-xl font-bold text-gray-900 mb-3">The Pitch</h3>
                 <p class="text-sm text-gray-600 leading-relaxed max-w-xs">Adversarial Agent proposes offers to maximize fulfillment.</p>
               </div>
 
-              <!-- Step 6 (Placed in DOM first for Row 2 Col 1) -->
-              <div class="flex flex-col items-center text-center relative group">
-                <!-- No arrow exiting Step 6 -->
-                <div class="w-24 h-24 bg-indigo-50 border border-indigo-100 rounded-full flex items-center justify-center mb-6 shadow-sm relative z-10">
-                   <!-- Chart Icon -->
-                   <svg class="w-10 h-10 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <!-- STEP 6 (Bottom Left) -->
+              <!-- Visual Order in DOM matches CSS Grid, but visually reversed by arrows -->
+              <div class="flex flex-col items-center text-center relative group order-last md:order-none">
+
+                <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6 shadow-sm ring-1 ring-indigo-100">
+                   <svg class="w-8 h-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
                    </svg>
                 </div>
-                <div class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">Step 6</div>
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Step 6</div>
                 <h3 class="text-xl font-bold text-gray-900 mb-3">Visibility</h3>
                 <p class="text-sm text-gray-600 leading-relaxed max-w-xs">Real-time sync of Reason Codes and delivery status.</p>
               </div>
 
-              <!-- Step 5 -->
-              <div class="flex flex-col items-center text-center relative group">
-                <!-- Arrow 5 to 6 (Left) -->
-                <svg class="hidden md:block absolute top-12 -left-16 w-24 h-6 text-gray-300 z-0 transform rotate-180" viewBox="0 0 100 20" preserveAspectRatio="none">
-                  <path d="M0,10 L95,10" stroke="currentColor" stroke-width="3" fill="none" />
-                  <path d="M90,5 L100,10 L90,15" fill="currentColor" />
-                </svg>
+              <!-- STEP 5 (Bottom Middle) -->
+              <div class="flex flex-col items-center text-center relative group order-5 md:order-none">
+                <!-- Arrow 5 -> 6 (Left) -->
+                <div class="hidden md:block absolute top-10 -left-[4.5rem] w-16 text-gray-300">
+                  <svg viewBox="0 0 24 24" fill="none" class="w-full h-6" stroke="currentColor" stroke-width="2">
+                     <path d="M19 12H5M9 8l-4 4 4 4" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
 
-                <div class="w-24 h-24 bg-green-50 border border-green-100 rounded-full flex items-center justify-center mb-6 shadow-sm relative z-10">
-                  <!-- Receipt / Invoice Icon -->
-                  <svg class="w-10 h-10 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-6 shadow-sm ring-1 ring-green-100">
+                  <svg class="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <div class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">Step 5</div>
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Step 5</div>
                 <h3 class="text-xl font-bold text-gray-900 mb-3">Execution</h3>
                 <p class="text-sm text-gray-600 leading-relaxed max-w-xs">Automated RFX & PO generation.</p>
               </div>
 
-              <!-- Step 4 -->
-              <div class="flex flex-col items-center text-center relative group">
-                <!-- Arrow 4 to 5 (Left) -->
-                <svg class="hidden md:block absolute top-12 -left-16 w-24 h-6 text-gray-300 z-0 transform rotate-180" viewBox="0 0 100 20" preserveAspectRatio="none">
-                  <path d="M0,10 L95,10" stroke="currentColor" stroke-width="3" fill="none" />
-                  <path d="M90,5 L100,10 L90,15" fill="currentColor" />
-                </svg>
+              <!-- STEP 4 (Bottom Right) -->
+              <div class="flex flex-col items-center text-center relative group order-4 md:order-none">
+                <!-- Arrow 4 -> 5 (Left) -->
+                <div class="hidden md:block absolute top-10 -left-[4.5rem] w-16 text-gray-300">
+                  <svg viewBox="0 0 24 24" fill="none" class="w-full h-6" stroke="currentColor" stroke-width="2">
+                     <path d="M19 12H5M9 8l-4 4 4 4" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
 
-                <div class="w-24 h-24 bg-yellow-50 border border-yellow-100 rounded-full flex items-center justify-center mb-6 shadow-sm relative z-10">
-                   <!-- Checkmark Icon -->
-                   <svg class="w-10 h-10 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="w-20 h-20 bg-yellow-50 rounded-full flex items-center justify-center mb-6 shadow-sm ring-1 ring-yellow-100">
+                   <svg class="w-8 h-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                    </svg>
                 </div>
-                <div class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">Step 4</div>
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Step 4</div>
                 <h3 class="text-xl font-bold text-gray-900 mb-3">The Counter</h3>
                 <p class="text-sm text-gray-600 leading-relaxed max-w-xs">Retailer responses reviewed by CSC.</p>
               </div>
@@ -357,5 +363,8 @@ const failureCards = [
         <div class="mt-4 md:mt-0 text-sm text-gray-400">© 2026 Amore Labs Inc.</div>
       </div>
     </footer>
+
+    <!-- Booking Modal -->
+    <BookingModal :is-open="showBooking" @close="showBooking = false" />
   </div>
 </template>
