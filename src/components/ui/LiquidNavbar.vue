@@ -41,6 +41,11 @@ const scrollTo = (id: string) => {
         </a>
       </div>
 
+      <!-- Admin Console Button -->
+      <a href="#/signin" class="hidden sm:block text-sm font-bold px-4 py-2.5 rounded-full border border-black/20 hover:bg-black/5 transition-colors mr-2">
+        Admin Console
+      </a>
+
       <!-- CTA Button -->
       <button @click="$emit('openBooking')"
               class="hidden sm:block bg-black text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-gray-800 transition-colors shadow-lg">
@@ -68,6 +73,9 @@ const scrollTo = (id: string) => {
          class="text-base font-medium text-black/80 hover:text-black px-4 py-2 hover:bg-black/5 rounded-lg transition-colors"
       >
         {{ item.label }}
+      </a>
+      <a href="#/signin" class="mt-2 w-full text-black border border-black/20 px-6 py-3 rounded-xl text-base font-bold hover:bg-black/5 transition-colors text-center block">
+        Admin Console
       </a>
       <button @click="$emit('openBooking'); isOpen = false"
               class="mt-2 w-full bg-black text-white px-6 py-3 rounded-xl text-base font-bold hover:bg-gray-800 transition-colors text-center">
