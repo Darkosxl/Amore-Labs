@@ -1,16 +1,50 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 
+const step = ref<'key' | 'request'>('key')
+const masterKeyInput = ref('')
+const isLoading = ref(false)
+const error = ref('')
 
-import { ref } from 'vue'
+// Check if device is already authorized
+onMounted(() => {
+  const isAuthorized = localStorage.getItem('amore_device_authorized')
+  if (isAuthorized === 'true') {
+    isLoading.value = true
+    window.location.href = 'http://localhost:8173/auth/login'
+  }
+})
 
-// Basic ref for plumbing later
-const email = ref('')
-const password = ref('')
+const verifyKey = async () => {
+  if (!masterKeyInput.value) return
+
+  isLoading.value = true
+  error.value = ''
+
+  // TODO: In a real implementation, this should call the backend to verify against .env
+  // For now, we simulate the check.
+
+  // Simulate network delay
+  setTimeout(() => {
+    // TEMPORARY: Hardcoded check for UI demonstration since I cannot touch backend
+    if (masterKeyInput.value.length > 0) {
+       // Success - Redirect immediately to WorkOS Auth
+       localStorage.setItem('amore_device_authorized', 'true')
+       window.location.href = 'http://localhost:8173/auth/login'
+    } else {
+       error.value = 'Invalid Enterprise Key'
+       isLoading.value = false
+    }
+  }, 800)
+}
+
+const showRequestForm = () => {
+  step.value = 'request'
+}
 </script>
 
 <template>
   <div class="min-h-screen font-sans text-gray-900 bg-gradient-to-br from-white via-white to-slate-50">
-
 
     <main class="flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8 relative">
 
@@ -29,10 +63,10 @@ const password = ref('')
         <!-- Header -->
         <div class="text-center">
           <h2 class="mt-6 text-4xl font-bold tracking-tighter text-gray-900">
-            Welcome Back
+            Enterprise Access
           </h2>
           <p class="mt-2 text-base text-gray-600">
-            Sign in to the Amore Labs Admin Console
+            Secure Gateway for Authorized Personnel
           </p>
         </div>
 
@@ -41,41 +75,53 @@ const password = ref('')
           <!-- Glow effect behind the card -->
           <div class="absolute -inset-0.5 bg-gradient-to-r from-gray-200 to-slate-200 rounded-[2rem] blur opacity-40 group-hover:opacity-60 transition duration-500"></div>
 
-          <div class="relative bg-white/60 backdrop-blur-xl ring-1 ring-white/50 border border-white/50 rounded-[2rem] p-8 sm:p-12 shadow-2xl">
-            <form class="space-y-6" @submit.prevent>
+          <div class="relative bg-white/60 backdrop-blur-xl ring-1 ring-white/50 border border-white/50 rounded-[2rem] p-8 sm:p-12 shadow-2xl transition-all duration-300">
 
-              <!-- Email Input -->
+            <!-- STEP 1: ENTERPRISE KEY -->
+            <form v-if="step === 'key'" @submit.prevent="verifyKey" class="space-y-6">
               <div>
-                <label for="email" class="block text-sm font-bold leading-6 text-gray-900 ml-1">Email address</label>
+                <label for="key" class="block text-sm font-bold leading-6 text-gray-900 ml-1">Enterprise Console Key</label>
                 <div class="mt-2">
-                  <input id="email" name="email" type="email" autocomplete="email" required v-model="email"
-                         class="block w-full rounded-xl border-0 py-3 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6 bg-white/50 backdrop-blur-sm transition-all" />
+                  <input id="key" name="key" type="password" required v-model="masterKeyInput"
+                         placeholder="••••••••••••••••"
+                         class="block w-full rounded-xl border-0 py-3 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6 bg-white/50 backdrop-blur-sm transition-all text-center tracking-widest" />
                 </div>
+                <p v-if="error" class="mt-2 text-sm text-red-600 font-medium text-center">{{ error }}</p>
               </div>
 
-              <!-- Password Input -->
-              <div>
-                <div class="flex items-center justify-between ml-1">
-                  <label for="password" class="block text-sm font-bold leading-6 text-gray-900">Password</label>
-                  <div class="text-sm">
-                    <a href="#" class="font-semibold text-gray-500 hover:text-gray-900 transition-colors">Forgot password?</a>
-                  </div>
-                </div>
-                <div class="mt-2">
-                  <input id="password" name="password" type="password" autocomplete="current-password" required v-model="password"
-                         class="block w-full rounded-xl border-0 py-3 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6 bg-white/50 backdrop-blur-sm transition-all" />
-                </div>
-              </div>
+              <div class="pt-2 space-y-4">
+                <button type="submit" :disabled="isLoading"
+                        class="flex w-full justify-center rounded-full bg-black px-3 py-3.5 text-sm font-bold leading-6 text-white shadow-lg hover:bg-gray-800 hover:shadow-xl hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed">
+                  <span v-if="isLoading">Verifying & Redirecting...</span>
+                  <span v-else>Access Console</span>
+                </button>
 
-              <!-- Sign In Button -->
-              <div class="pt-2">
-                <button type="submit"
-                        class="flex w-full justify-center rounded-full bg-black px-3 py-3.5 text-sm font-bold leading-6 text-white shadow-lg hover:bg-gray-800 hover:shadow-xl hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black transition-all duration-200">
-                  Sign in
+                <button type="button" @click="showRequestForm" class="w-full text-center text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors">
+                  Don't have a key? Request Access
                 </button>
               </div>
-
             </form>
+
+            <!-- STEP 2: REQUEST RECEIVED -->
+            <div v-else-if="step === 'request'" class="text-center space-y-6">
+               <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-2">
+                 <svg class="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                 </svg>
+               </div>
+
+               <div>
+                 <h3 class="text-lg font-bold text-gray-900">Request Received</h3>
+                 <p class="mt-2 text-sm text-gray-600">
+                   We have logged your request from this device. An administrator will review it shortly.
+                 </p>
+               </div>
+
+               <button @click="step = 'key'" class="text-sm font-bold text-black hover:underline mt-4">
+                 Back to Gateway
+               </button>
+            </div>
+
           </div>
         </div>
 

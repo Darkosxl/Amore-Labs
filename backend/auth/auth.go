@@ -56,3 +56,12 @@ func Me (c *gin.Context) {
 		"role": claims.Role
 	})
 }
+
+func VerifyMasterKeyHandler(c *gin.Context) {
+	key := c.PostForm("key")
+	if key != os.Getenv("MASTER_KEY") {
+		c.JSON(http.StatusUnauthorized, gin.H{"status": "failed", "error": "Invalid master key"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": "success"})
+}

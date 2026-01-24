@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const homeLink = ref('#/')
+const homeLink = ref('#/admin_console')
 </script>
 
 <template>

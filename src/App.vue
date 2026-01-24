@@ -3,6 +3,7 @@ import LandingPage from './components/LandingPage.vue'
 import SignIn from './components/SignIn.vue'
 import PaymentSuccess from './components/PaymentSuccess.vue'
 import PaymentFailure from './components/PaymentFailure.vue'
+import AdminConsole from './components/AdminConsole.vue'
 import { ref, computed, onMounted } from 'vue'
 
 const currentPath = ref(window.location.hash)
@@ -21,6 +22,8 @@ const currentView = computed(() => {
       return PaymentSuccess
     case '#/failure':
       return PaymentFailure
+    case '#/admin_console':
+      return AdminConsole
     default:
       return LandingPage
   }
