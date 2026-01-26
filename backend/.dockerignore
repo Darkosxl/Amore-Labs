@@ -16,9 +16,7 @@ Thumbs.db
 # Logs
 *.log
 
-# Environment files (load via docker-compose or secrets)
-.env
-.env.local
+
 
 # Git
 .git/

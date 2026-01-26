@@ -18,10 +18,7 @@ Thumbs.db
 *.log
 npm-debug.log*
 
-# Environment files (for security - load via docker-compose)
-.env
-.env.local
-.env.*.local
+
 
 # Git
 .git/
