@@ -21,21 +21,37 @@ const verifyKey = async () => {
   isLoading.value = true
   error.value = ''
 
-  // TODO: In a real implementation, this should call the backend to verify against .env
-  // For now, we simulate the check.
+  try {
+    const formData = new URLSearchParams()
+    formData.append('key', masterKeyInput.value)
 
-  // Simulate network delay
-  setTimeout(() => {
-    // TEMPORARY: Hardcoded check for UI demonstration since I cannot touch backend
-    if (masterKeyInput.value.length > 0) {
-       // Success - Redirect immediately to WorkOS Auth
-       localStorage.setItem('amore_device_authorized', 'true')
-       window.location.href = 'http://localhost:8173/auth/login'
-    } else {
-       error.value = 'Invalid Enterprise Key'
-       isLoading.value = false
+    const response = await fetch('http://localhost:8173/auth/verify-masterkey', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: formData
+    })
+
+    if (!response.ok) {
+       // Try to parse error message from JSON if possible
+       try {
+         const data = await response.json()
+         throw new Error(data.error || 'Invalid Enterprise Key')
+       } catch (e) {
+         throw new Error('Invalid Enterprise Key')
+       }
     }
-  }, 800)
+
+    // Success
+    localStorage.setItem('amore_device_authorized', 'true')
+    window.location.href = 'http://localhost:8173/auth/login'
+
+  } catch (err: any) {
+    console.error(err)
+    error.value = err.message || 'Connection failed'
+    isLoading.value = false
+  }
 }
 
 const showRequestForm = () => {

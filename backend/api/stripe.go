@@ -1,12 +1,16 @@
 package api
 
 import (
-	"github.com/stripe/stripe-go/v84"
-	"github.com/gin-gonic/gin"
+	mw "amorelabs/backend/middleware"
+	"context"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/stripe/stripe-go/v84"
 	"github.com/stripe/stripe-go/v84/checkout/session"
+	"github.com/workos/workos-go/v6/pkg/usermanagement"
 )
 
 var AmoreLabsPrices = map[string]string{
@@ -17,38 +21,65 @@ var AmoreLabsPrices = map[string]string{
 }
 
 func CreateCheckoutSession(c *gin.Context) {
-  product, ok := AmoreLabsPrices[c.Param("product")]
-  if !ok {
-    c.JSON(http.StatusBadRequest, gin.H{"error": "Product doesn't exist"})
-    return
-  }
-  
-  stripe.Key = os.Getenv("STRIPE_API_KEY")
-  domain := os.Getenv("STRIPE_DOMAIN")
-  params := &stripe.CheckoutSessionParams{
-    LineItems: []*stripe.CheckoutSessionLineItemParams{
-      &stripe.CheckoutSessionLineItemParams{
-        // Provide the exact Price ID (for example, price_1234) of the product you want to sell
-        Price: stripe.String(product),
-        Quantity: stripe.Int64(1),
-      },
-    },
-    Mode: stripe.String(string(stripe.CheckoutSessionModeSubscription)),
-    SuccessURL: stripe.String(domain + "/success"),
-    CancelURL: stripe.String(domain + "/failure"),
-    AutomaticTax: &stripe.CheckoutSessionAutomaticTaxParams{Enabled: stripe.Bool(true)},
-    CreateCustomers: %stripe.CheckoutSessionParams.CustomerCreation.ALWAYS,
-    // Provide the Customer ID (for example, cus_1234) for an existing customer to associate it with this session
-    // Customer: "cus_RnhPlBnbBbXapY",
-  }
+	product, ok := AmoreLabsPrices[c.Param("product")]
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Product doesn't exist"})
+		return
+	}
 
-  s, err := session.New(params)
+	// Get authenticated user from middleware
+	claimsCheck, exists := c.Get("claims")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"status": "failed", "error": "Unauthorized"})
+		return
+	}
+	claims, ok := claimsCheck.(*mw.Claims)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"status": "failed", "error": "Invalid claims type"})
+		return
+	}
 
-  if err != nil {
-    log.Printf("session.New: %v", err)
-    c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create checkout session"})
-    return
-  }
+	// Get user details from WorkOS
+	ctx := context.Background()
+	user, err := usermanagement.GetUser(ctx, usermanagement.GetUserOpts{
+		User: claims.UserID,
+	})
+	if err != nil {
+		log.Printf("Failed to get user from WorkOS: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user details"})
+		return
+	}
 
-  c.Redirect(http.StatusSeeOther, s.URL)
+	stripe.Key = os.Getenv("STRIPE_API_KEY")
+	domain := os.Getenv("STRIPE_DOMAIN")
+	
+	params := &stripe.CheckoutSessionParams{
+		LineItems: []*stripe.CheckoutSessionLineItemParams{
+			{
+				Price:    stripe.String(product),
+				Quantity: stripe.Int64(1),
+			},
+		},
+		Mode:       stripe.String(string(stripe.CheckoutSessionModeSubscription)),
+		SuccessURL: stripe.String(domain + "/success?session_id={CHECKOUT_SESSION_ID}"),
+		CancelURL:  stripe.String(os.Getenv("FRONTEND_URL") + "/#/admin_console?payment_failed=true"),
+		AutomaticTax: &stripe.CheckoutSessionAutomaticTaxParams{Enabled: stripe.Bool(true)},
+		CustomerEmail: stripe.String(user.Email),
+		Metadata: map[string]string{
+			"workos_user_id": user.ID,
+			"user_email":     user.Email,
+		},
+	}
+
+	log.Printf("Creating checkout session for user: %s (%s)", user.Email, user.ID)
+
+	s, err := session.New(params)
+
+	if err != nil {
+		log.Printf("session.New: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create checkout session"})
+		return
+	}
+
+	c.Redirect(http.StatusSeeOther, s.URL)
 }

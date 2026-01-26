@@ -25,7 +25,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "amorelabs.amoredit.com:5173, localhost:5173")
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
 		
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		

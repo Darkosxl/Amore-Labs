@@ -1,6 +1,23 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
+// Toast notification state
+const showToast = ref(false)
+const toastMessage = ref('')
+const toastType = ref<'error' | 'success'>('error')
+
+// Show toast notification
+const showNotification = (message: string, type: 'error' | 'success' = 'error') => {
+  toastMessage.value = message
+  toastType.value = type
+  showToast.value = true
+
+  // Auto-hide after 4 seconds
+  setTimeout(() => {
+    showToast.value = false
+  }, 4000)
+}
+
 // Mock data for UI demonstration
 const user = ref({
   name: 'Loading...',
@@ -10,6 +27,14 @@ const user = ref({
 
 // Fetch User Data
 onMounted(async () => {
+  // Check for payment failure in URL
+  const urlParams = new URLSearchParams(window.location.search)
+  if (urlParams.get('payment_failed') === 'true') {
+    showNotification('Payment cancelled: You can try again anytime', 'error')
+    // Clean up URL
+    window.history.replaceState({}, '', window.location.pathname + window.location.hash.split('?')[0])
+  }
+
   try {
     // Attempt to fetch real user data from backend
     // Note: This assumes the backend is running on port 8173 and CORS is configured
@@ -69,7 +94,7 @@ const products = ref([
     borderColor: 'border-blue-500/30'
   },
   {
-    id: 'outbound',
+    id: 'voice_ai_italy_outbound',
     name: 'Outbound AI',
     description: 'Logistics precision, OTIF management, and carrier negotiation.',
     status: 'trial',
@@ -79,7 +104,7 @@ const products = ref([
     borderColor: 'border-purple-500/30'
   },
   {
-    id: 'inbound',
+    id: 'voice_ai_italy_inbound',
     name: 'Inbound AI',
     description: 'Seamless ERP integration and supply chain ingestion.',
     status: 'inactive',
@@ -217,6 +242,32 @@ const products = ref([
         <span class="text-xs text-gray-500 leading-tight">{{ user.email }}</span>
       </div>
     </div>
+
+    <!-- Toast Notification -->
+    <Transition
+      enter-active-class="transition-all duration-300 ease-out"
+      enter-from-class="opacity-0 translate-y-4"
+      enter-to-class="opacity-100 translate-y-0"
+      leave-active-class="transition-all duration-300 ease-in"
+      leave-from-class="opacity-100 translate-y-0"
+      leave-to-class="opacity-0 translate-y-4"
+    >
+      <div v-if="showToast"
+           class="fixed top-6 right-6 z-50 max-w-md px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-md border"
+           :class="toastType === 'error' ? 'bg-red-500/90 border-red-400 text-white' : 'bg-green-500/90 border-green-400 text-white'">
+        <div class="flex items-center gap-3">
+          <!-- Icon -->
+          <svg v-if="toastType === 'error'" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <svg v-else class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <!-- Message -->
+          <p class="font-medium">{{ toastMessage }}</p>
+        </div>
+      </div>
+    </Transition>
 
   </div>
 </template>

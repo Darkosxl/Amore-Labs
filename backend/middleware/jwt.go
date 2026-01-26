@@ -1,37 +1,50 @@
 package middleware
 
 import (
-	"github.com/golang-jwt/jwt/v5"
+	"fmt"
 	"os"
 	"time"
-	"fmt"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenerateToken(userid string, email string, role string) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user": userid,
-		"email": email,
-		"role": role,
-		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
-	})
-	
-	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
-	if err != nil {
-		return "", err
-	}
-	return tokenString, nil
+type Claims struct {
+	UserID string `json:"user_id"`
+	Email string `json:"email"`
+	Role string `json:"role"`
+	Entitlements []string `json:"entitlements"`
+	jwt.RegisteredClaims
 }
 
-func ValidateToken(token string) (jwt.MapClaims, error)  {
-	tokenString, err := jwt.Parse(token, func(token *jwt.Token) (any, error) {
+func GenerateToken(userid string, email string, role string, entitlements []string) (string, error) {
+	claims := Claims{
+		UserID: userid,
+		Email: email,
+		Role: role,
+		Entitlements: entitlements,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 30)),
+			IssuedAt: jwt.NewNumericDate(time.Now()),
+			Issuer: "amorelabs",
+		},
+	}
+
+	tokenString := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	return tokenString.SignedString([]byte(os.Getenv("JWT_SECRET")))
+}
+
+func ValidateToken(token string) (*Claims, error)  {
+	tokenString, err := jwt.ParseWithClaims(token, &Claims{}, 
+		func(token *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("JWT_SECRET")), nil
-	}, jwt.WithValidMethods([]string{"HS256"}))
+	})
 	if err != nil {
 		return nil, err
 	}
-	if claims, ok := tokenString.Claims.(jwt.MapClaims); ok {
+	if claims, ok := tokenString.Claims.(*Claims); ok {
 		return claims, nil
 	} else {
-		return nil, fmt.Errorf("invalid token")
+		return nil, fmt.Errorf("invalid token claims")
 	}
 }

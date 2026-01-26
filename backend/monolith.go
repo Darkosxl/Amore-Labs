@@ -5,10 +5,19 @@ import (
 	auth "amorelabs/backend/auth"
 	mw "amorelabs/backend/middleware"
 	"github.com/gin-gonic/gin"
-	
+	"github.com/joho/godotenv"
+	"log"
+	"github.com/workos/workos-go/v6/pkg/usermanagement"	
+	"os"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	usermanagement.SetAPIKey(os.Getenv("WORKOS_API_KEY"))
+
 	r := gin.Default()
 	r.Use(mw.CORSMiddleware())
 	authorized := r.Group("/v1")
@@ -18,17 +27,23 @@ func main() {
 	// HEALTH
 	r.GET("/health", h.HealthHandler)
 
+	// WEBHOOKS (unprotected)
+	r.POST("/webhooks/stripe", h.StripeWebhook)
+
 	// AUTH
-	r.POST("/auth/login", auth.LoginHandler)
+	r.GET("/auth/login", auth.LoginHandler)
 	
-	r.POST("/callback", auth.CallbackHandler)
+	r.GET("auth/callback", auth.CallbackHandler)
 	
 	r.POST("/auth/verify-masterkey", auth.VerifyMasterKeyHandler)
-	// PROTECTED ROUTES
+	
 	authorized.Use(mw.AuthMiddleware())
-	authorized.POST("/admin_console", auth.AdminConsoleHandler)
 	authorized.GET("/me", auth.Me)
 	authorized.POST("/billing/:product", h.CreateCheckoutSession)
+	
+	
+	authorized.GET("/subscriptions", h.GetSubscriptions)
+	authorized.GET("/entitlements", h.GetEntitlements)
 	
 	r.Run(":8173")
 }
