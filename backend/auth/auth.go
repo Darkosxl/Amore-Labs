@@ -15,7 +15,7 @@ import (
 func LoginHandler(c *gin.Context) {
 	authUrl, err := usermanagement.GetAuthorizationURL(usermanagement.GetAuthorizationURLOpts{
 		ClientID: os.Getenv("WORKOS_CLIENT_ID"),
-		RedirectURI: "http://localhost:8173/auth/callback",
+		RedirectURI: os.Getenv("API_URL") + "/auth/callback",
 		Provider: "authkit",
 	})
 	if err != nil {
@@ -28,7 +28,7 @@ func LoginHandler(c *gin.Context) {
 
 func LogoutHandler(c *gin.Context) {
 	// Clear the access token cookie
-	c.SetCookie("access_token", "", -1, "/", "localhost", false, true)
+	c.SetCookie("access_token", "", -1, "/", os.Getenv("COOKIE_DOMAIN"), false, true)
 
 	// Get WorkOS Logout URL
 	logoutUrl, err := usermanagement.GetLogoutURL(usermanagement.GetLogoutURLOpts{
@@ -37,7 +37,7 @@ func LogoutHandler(c *gin.Context) {
 	
 	if err != nil {
 		// Fallback if URL gen fails: just redirect to home
-		c.Redirect(http.StatusFound, "http://localhost:5173/")
+		c.Redirect(http.StatusFound, os.Getenv("FRONTEND_URL"))
 		return
 	}
 
@@ -64,7 +64,7 @@ func CallbackHandler(c *gin.Context){
 		return
 	}
 	frontendUrl := os.Getenv("FRONTEND_URL")
-	c.SetCookie("access_token", accesstoken, 86400, "/", "localhost", false, true)
+	c.SetCookie("access_token", accesstoken, 86400, "/", os.Getenv("COOKIE_DOMAIN"), false, true)
 	c.Redirect(http.StatusFound, frontendUrl + "#/admin_console")
 	
 }
