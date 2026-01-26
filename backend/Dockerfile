@@ -28,6 +28,9 @@ WORKDIR /root/
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/server .
 
+# Copy the .env file
+COPY --from=builder /app/.env .
+
 # Expose port 8173 to the outside world
 EXPOSE 8173
 

@@ -7,6 +7,16 @@ const showToast = ref(false)
 const toastMessage = ref('')
 const toastType = ref<'error' | 'success'>('error')
 
+// Free trial toggle state (persisted in localStorage)
+const freeTrialEnabled = ref(localStorage.getItem('free_trial_enabled') === 'true')
+
+// Toggle free trial mode
+const toggleFreeTrial = () => {
+  freeTrialEnabled.value = !freeTrialEnabled.value
+  localStorage.setItem('free_trial_enabled', String(freeTrialEnabled.value))
+  // No notification - keep it mysterious
+}
+
 // Show toast notification
 const showNotification = (message: string, type: 'error' | 'success' = 'error') => {
   toastMessage.value = message
@@ -32,7 +42,8 @@ const loadingSubscriptions = ref(true)
 // Handle billing redirect
 const handleBilling = async (productId: string) => {
   // Redirect to backend billing endpoint to create Stripe session
-  const backendUrl = `http://localhost:8173/v1/billing/${productId}`
+  const trialParam = freeTrialEnabled.value ? '?free_trial=true' : ''
+  const backendUrl = `http://localhost:8173/v1/billing/${productId}${trialParam}`
 
   // Create a form and submit it to redirect the user
   const form = document.createElement('form')
@@ -211,6 +222,20 @@ onMounted(async () => {
         <div class="text-center mb-12">
           <h2 class="text-4xl font-bold tracking-tighter text-gray-900 mb-4">Admin Console</h2>
           <p class="text-gray-500">Manage your Amore Labs product suite.</p>
+
+          <!-- Minimalist Toggle -->
+          <div class="mt-4 flex justify-center">
+            <button
+              @click="toggleFreeTrial"
+              :class="freeTrialEnabled ? 'bg-green-500' : 'bg-slate-300'"
+              class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none"
+            >
+              <span
+                :class="freeTrialEnabled ? 'translate-x-5' : 'translate-x-0.5'"
+                class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm"
+              />
+            </button>
+          </div>
         </div>
 
         <!-- Product Cards Stack -->

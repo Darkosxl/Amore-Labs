@@ -59,6 +59,9 @@ func CreateCheckoutSession(c *gin.Context) {
 		stripe.Key = os.Getenv("STRIPE_TEST_API_KEY")
 	}
 	
+	// Check if free trial is enabled
+	freeTrialEnabled := c.Query("free_trial") == "true"
+	
 	params := &stripe.CheckoutSessionParams{
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			{
@@ -77,7 +80,18 @@ func CreateCheckoutSession(c *gin.Context) {
 		},
 	}
 
-	log.Printf("Creating checkout session for user: %s (%s)", user.Email, user.ID)
+	// Add free trial configuration if enabled
+	if freeTrialEnabled {
+		params.SubscriptionData = &stripe.CheckoutSessionSubscriptionDataParams{
+			TrialPeriodDays: stripe.Int64(30), // 1 month trial
+		}
+		// Ensure payment method is collected during trial
+		params.PaymentMethodCollection = stripe.String("always")
+		
+		log.Printf("Creating checkout session with 30-day free trial for user: %s", user.Email)
+	} else {
+		log.Printf("Creating immediate checkout session for user: %s", user.Email)
+	}
 
 	s, err := session.New(params)
 

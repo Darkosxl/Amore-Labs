@@ -13,9 +13,11 @@ import (
 )
 
 func main() {
+	// Try to load .env file, but don't crash if it doesn't exist
+	// (env vars might be set by deployment platform)
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("Warning: .env file not found, using environment variables from system")
 	}
 	usermanagement.SetAPIKey(os.Getenv("WORKOS_API_KEY"))
 
