@@ -1,53 +1,35 @@
-# Backend Dockerfile - Go with multi-stage build
-# Produces a minimal production image
-
-# Stage 1: Build the Go binary
-FROM golang:1.22-alpine AS builder
+# Build stage
+FROM golang:1.25-alpine AS builder
 
 WORKDIR /app
 
-# Install git (needed for some Go modules)
+# Install git for fetching dependencies
 RUN apk add --no-cache git
 
-# Copy go mod files first for better caching
+# Copy go mod and sum files
 COPY go.mod go.sum ./
 
-# Download dependencies
+# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
 RUN go mod download
 
-# Copy source code
+# Copy the source from the current directory to the Working Directory inside the container
 COPY . .
 
-# Build the binary with optimizations
-# CGO_ENABLED=0 for static binary, GOOS=linux for Linux target
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /app/server ./monolith.go
+# Build the Go app
+RUN go build -o server monolith.go
 
-# Stage 2: Minimal runtime image
-FROM alpine:3.19 AS production
+# Start a new stage from scratch
+FROM alpine:latest  
 
-WORKDIR /app
+RUN apk --no-cache add ca-certificates
 
-# Install CA certificates for HTTPS calls (Stripe, WorkOS, etc.)
-RUN apk --no-cache add ca-certificates tzdata
+WORKDIR /root/
 
-# Create non-root user for security
-RUN adduser -D -g '' appuser
-
-# Copy binary from builder
+# Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/server .
 
-# Change ownership
-RUN chown -R appuser:appuser /app
-
-# Switch to non-root user
-USER appuser
-
-# Expose the backend port
+# Expose port 8173 to the outside world
 EXPOSE 8173
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8173/health || exit 1
-
-# Run the server
+# Command to run the executable
 CMD ["./server"]
