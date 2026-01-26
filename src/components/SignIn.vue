@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
+// Get API URL from environment variable (falls back to localhost for dev)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8173'
+
 const step = ref<'key' | 'request'>('key')
 const masterKeyInput = ref('')
 const isLoading = ref(false)
@@ -11,7 +14,7 @@ onMounted(() => {
   const isAuthorized = localStorage.getItem('amore_device_authorized')
   if (isAuthorized === 'true') {
     isLoading.value = true
-    window.location.href = 'http://localhost:8173/auth/login'
+    window.location.href = `${API_URL}/auth/login`
   }
 })
 
@@ -25,7 +28,7 @@ const verifyKey = async () => {
     const formData = new URLSearchParams()
     formData.append('key', masterKeyInput.value)
 
-    const response = await fetch('http://localhost:8173/auth/verify-masterkey', {
+    const response = await fetch(`${API_URL}/auth/verify-masterkey`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -45,7 +48,7 @@ const verifyKey = async () => {
 
     // Success
     localStorage.setItem('amore_device_authorized', 'true')
-    window.location.href = 'http://localhost:8173/auth/login'
+    window.location.href = `${API_URL}/auth/login`
 
   } catch (err: any) {
     console.error(err)

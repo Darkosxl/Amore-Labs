@@ -2,6 +2,9 @@
 import { ref, onMounted } from 'vue'
 import ProductCard from './ProductCard.vue'
 
+// Get API URL from environment variable (falls back to localhost for dev)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8173'
+
 // Toast notification state
 const showToast = ref(false)
 const toastMessage = ref('')
@@ -43,7 +46,7 @@ const loadingSubscriptions = ref(true)
 const handleBilling = async (productId: string) => {
   // Redirect to backend billing endpoint to create Stripe session
   const trialParam = freeTrialEnabled.value ? '?free_trial=true' : ''
-  const backendUrl = `http://localhost:8173/v1/billing/${productId}${trialParam}`
+  const backendUrl = `${API_URL}/v1/billing/${productId}${trialParam}`
 
   // Create a form and submit it to redirect the user
   const form = document.createElement('form')
@@ -117,7 +120,7 @@ const products = ref([
 // Fetch subscriptions and update product statuses
 const fetchSubscriptions = async () => {
   try {
-    const response = await fetch('http://localhost:8173/v1/subscriptions', {
+    const response = await fetch(`${API_URL}/v1/subscriptions`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -176,7 +179,7 @@ onMounted(async () => {
 
   try {
     // Fetch user data
-    const response = await fetch('http://localhost:8173/v1/me', {
+    const response = await fetch(`${API_URL}/v1/me`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
