@@ -1,4 +1,4 @@
-//AI coded
+// AI coded
 package api
 
 import (
@@ -29,25 +29,45 @@ func StripeWebhook(c *gin.Context) {
 	// Get the Stripe signature from headers
 	signatureHeader := c.GetHeader("Stripe-Signature")
 	
-	// Verify webhook signature if webhook secret is configured
+	// Try both webhook secrets (test and production)
 	webhookSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
+	prodWebhookSecret := os.Getenv("STRIPE_PROD_WEBHOOK_SECRET")
 	var event stripe.Event
 	
+	verified := false
+	
+	// Try test webhook secret first
 	if webhookSecret != "" {
-		// Verify the webhook signature
 		event, err = webhook.ConstructEvent(payload, signatureHeader, webhookSecret)
-		if err != nil {
-			log.Printf("Webhook signature verification failed: %v", err)
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid signature"})
-			return
+		if err == nil {
+			log.Println("✓ Webhook verified with TEST secret")
+			verified = true
 		}
-	} else {
-		// In development, if no secret is set, just parse the event
-		log.Println("WARNING: No STRIPE_WEBHOOK_SECRET set, skipping signature verification")
-		err := json.Unmarshal(payload, &event)
-		if err != nil {
-			log.Printf("Failed to parse webhook JSON: %v", err)
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
+	}
+	
+	// If test failed and prod secret exists, try prod
+	if !verified && prodWebhookSecret != "" {
+		event, err = webhook.ConstructEvent(payload, signatureHeader, prodWebhookSecret)
+		if err == nil {
+			log.Println("✓ Webhook verified with PROD secret")
+			verified = true
+		}
+	}
+	
+	// If both failed or no secrets configured
+	if !verified {
+		if webhookSecret == "" && prodWebhookSecret == "" {
+			log.Println("⚠️  WARNING: No webhook secrets configured. Accepting unverified webhook (UNSAFE for production)")
+			// Parse without verification
+			err := json.Unmarshal(payload, &event)
+			if err != nil {
+				log.Printf("Failed to parse webhook JSON: %v", err)
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
+				return
+			}
+		} else {
+			log.Printf("❌ Webhook signature verification failed: %v", err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid signature"})
 			return
 		}
 	}

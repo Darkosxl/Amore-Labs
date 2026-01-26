@@ -89,6 +89,17 @@ const products = ref([
     iconColor: 'text-slate-500',
     bgColor: 'bg-slate-500/10',
     borderColor: 'border-slate-500/20'
+  },
+  {
+    id: 'test_product',
+    name: '🧪 Test Product',
+    description: 'Internal testing only - visible to bscemarslan@gmail.com',
+    status: 'inactive',
+    renewalDate: null as string | null,
+    trialDaysLeft: null as number | null,
+    iconColor: 'text-yellow-500',
+    bgColor: 'bg-yellow-500/20',
+    borderColor: 'border-yellow-500/30'
   }
 ])
 
@@ -218,6 +229,11 @@ onMounted(async () => {
             <!-- Rinova AI Card -->
             <div class="relative group" v-if="products[0]">
               <ProductCard :product="products[0]" @activate="handleBilling" />
+            </div>
+
+            <!-- Test Product Card (only for bscemarslan@gmail.com) -->
+            <div class="relative group" v-if="products[3] && user.email === 'bscemarslan@gmail.com'">
+              <ProductCard :product="products[3]" @activate="handleBilling" />
             </div>
 
             <!-- Outbound AI Card -->

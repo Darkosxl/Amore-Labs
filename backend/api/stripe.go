@@ -14,10 +14,11 @@ import (
 )
 
 var AmoreLabsPrices = map[string]string{
-	"voice_ai_italy_inbound": "price_1Ssl0sLOfzIWfxHPQmMX4JbI",
-	"voice_ai_italy_outbound": "price_1StBmVLOfzIWfxHP7VXZsMbB",
+	"voice_ai_italy_inbound":          "price_1Ssl0sLOfzIWfxHPQmMX4JbI",
+	"voice_ai_italy_outbound":         "price_1StBmVLOfzIWfxHP7VXZsMbB",
 	"voice_ai_italy_outbound-inbound": "price_1StBn4LOfzIWfxHPzOS1DXq8",
-	"rinova_ai": "price_1StBnwLOfzIWfxHPdy0Ke7mH",
+	"rinova_ai":                       "price_1StBnwLOfzIWfxHPdy0Ke7mH",
+	"test_product":                    "price_1StqUxLOfzIWfxHPQva2nD7l", // Test product for bscemarslan@gmail.com
 }
 
 func CreateCheckoutSession(c *gin.Context) {
@@ -51,7 +52,12 @@ func CreateCheckoutSession(c *gin.Context) {
 	}
 
 	stripe.Key = os.Getenv("STRIPE_API_KEY")
-	domain := os.Getenv("STRIPE_DOMAIN")
+	
+	// Use test API key for test products
+	productName := c.Param("product")
+	if productName == "test_product" {
+		stripe.Key = os.Getenv("STRIPE_TEST_API_KEY")
+	}
 	
 	params := &stripe.CheckoutSessionParams{
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
@@ -61,7 +67,7 @@ func CreateCheckoutSession(c *gin.Context) {
 			},
 		},
 		Mode:       stripe.String(string(stripe.CheckoutSessionModeSubscription)),
-		SuccessURL: stripe.String(domain + "/success?session_id={CHECKOUT_SESSION_ID}"),
+		SuccessURL: stripe.String(os.Getenv("FRONTEND_URL") + "/#/payment_success?session_id={CHECKOUT_SESSION_ID}"),
 		CancelURL:  stripe.String(os.Getenv("FRONTEND_URL") + "/#/admin_console?payment_failed=true"),
 		AutomaticTax: &stripe.CheckoutSessionAutomaticTaxParams{Enabled: stripe.Bool(true)},
 		CustomerEmail: stripe.String(user.Email),
