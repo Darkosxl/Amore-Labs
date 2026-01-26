@@ -4,11 +4,12 @@ import (
 	h "amorelabs/backend/api"
 	auth "amorelabs/backend/auth"
 	mw "amorelabs/backend/middleware"
+	"log"
+	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"log"
-	"github.com/workos/workos-go/v6/pkg/usermanagement"	
-	"os"
+	"github.com/workos/workos-go/v6/pkg/usermanagement"
 )
 
 func main() {
@@ -34,6 +35,7 @@ func main() {
 	r.GET("/auth/login", auth.LoginHandler)
 	
 	r.GET("auth/callback", auth.CallbackHandler)
+	r.GET("/auth/logout", auth.LogoutHandler)
 	
 	r.POST("/auth/verify-masterkey", auth.VerifyMasterKeyHandler)
 	

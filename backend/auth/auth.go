@@ -26,6 +26,25 @@ func LoginHandler(c *gin.Context) {
 	
 }
 
+func LogoutHandler(c *gin.Context) {
+	// Clear the access token cookie
+	c.SetCookie("access_token", "", -1, "/", "localhost", false, true)
+
+	// Get WorkOS Logout URL
+	logoutUrl, err := usermanagement.GetLogoutURL(usermanagement.GetLogoutURLOpts{
+		SessionID: "", // We don't store the WorkOS session ID separately, relying on their side
+	})
+	
+	if err != nil {
+		// Fallback if URL gen fails: just redirect to home
+		c.Redirect(http.StatusFound, "http://localhost:5173/")
+		return
+	}
+
+	// Redirect to WorkOS to end their session, then they will redirect back
+	c.Redirect(http.StatusFound, logoutUrl.String())
+}
+
 func CallbackHandler(c *gin.Context){
 	code := c.Query("code")
 	ctx := context.Background()

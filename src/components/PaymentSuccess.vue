@@ -1,7 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
 const homeLink = ref('#/admin_console')
+const countdown = ref(3)
+
+// Auto-redirect after 3 seconds
+onMounted(() => {
+  const interval = setInterval(() => {
+    countdown.value--
+    if (countdown.value <= 0) {
+      clearInterval(interval)
+      window.location.hash = '/admin_console'
+    }
+  }, 1000)
+})
 </script>
 
 <template>
@@ -40,7 +52,8 @@ const homeLink = ref('#/admin_console')
             </h2>
 
             <p class="text-base text-gray-600 mb-8">
-              Thank you for your purchase. Your order has been processed successfully.
+              Thank you for your purchase. Your order has been processed successfully.<br>
+              <span class="text-sm text-gray-500 mt-2 block">Redirecting to dashboard in {{ countdown }} seconds...</span>
             </p>
 
             <div class="flex flex-col gap-4">

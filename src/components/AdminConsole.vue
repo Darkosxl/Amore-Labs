@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import ProductCard from './ProductCard.vue'
 
 // Toast notification state
 const showToast = ref(false)
@@ -18,14 +19,125 @@ const showNotification = (message: string, type: 'error' | 'success' = 'error') 
   }, 4000)
 }
 
-// Mock data for UI demonstration
+// User data
 const user = ref({
   name: 'Loading...',
   email: '...',
   avatarGradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
 })
 
-// Fetch User Data
+// Loading state
+const loadingSubscriptions = ref(true)
+
+// Handle billing redirect
+const handleBilling = async (productId: string) => {
+  // Redirect to backend billing endpoint to create Stripe session
+  const backendUrl = `http://localhost:8173/v1/billing/${productId}`
+
+  // Create a form and submit it to redirect the user
+  const form = document.createElement('form')
+  form.method = 'POST'
+  form.action = backendUrl
+  document.body.appendChild(form)
+  form.submit()
+}
+
+const handleSignOut = () => {
+  // Clear any local storage if used
+  localStorage.removeItem('user')
+
+  // Redirect to Backend Logout (which handles WorkOS logout)
+  window.location.href = 'http://localhost:8173/auth/logout'
+}
+
+// Product Data - will be updated with real subscription info
+const products = ref([
+  {
+    id: 'rinova_ai',
+    name: 'Rinova AI',
+    description: 'Automated dispute resolution and revenue recovery.',
+    status: 'inactive',
+    renewalDate: null as string | null,
+    trialDaysLeft: null as number | null,
+    iconColor: 'text-blue-500',
+    bgColor: 'bg-blue-500/20',
+    borderColor: 'border-blue-500/30'
+  },
+  {
+    id: 'voice_ai_italy_outbound',
+    name: 'Outbound AI',
+    description: 'Logistics precision, OTIF management, and carrier negotiation.',
+    status: 'inactive',
+    renewalDate: null as string | null,
+    trialDaysLeft: null as number | null,
+    iconColor: 'text-purple-500',
+    bgColor: 'bg-purple-500/20',
+    borderColor: 'border-purple-500/30'
+  },
+  {
+    id: 'voice_ai_italy_inbound',
+    name: 'Inbound AI',
+    description: 'Seamless ERP integration and supply chain ingestion.',
+    status: 'inactive',
+    renewalDate: null as string | null,
+    trialDaysLeft: null as number | null,
+    iconColor: 'text-slate-500',
+    bgColor: 'bg-slate-500/10',
+    borderColor: 'border-slate-500/20'
+  }
+])
+
+// Fetch subscriptions and update product statuses
+const fetchSubscriptions = async () => {
+  try {
+    const response = await fetch('http://localhost:8173/v1/subscriptions', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include'
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+
+      // Map subscriptions to products
+      if (data.subscriptions && data.subscriptions.length > 0) {
+        data.subscriptions.forEach((sub: { product_name: string; status: string; current_period_end: number }) => {
+          const product = products.value.find(p => p.id === sub.product_name)
+          if (product) {
+            // Determine status based on subscription status
+            if (sub.status === 'active') {
+              product.status = 'active'
+              // Format renewal date
+              const renewalDate = new Date(sub.current_period_end * 1000)
+              product.renewalDate = renewalDate.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+              })
+            } else if (sub.status === 'trialing') {
+              product.status = 'trial'
+              // Calculate days left in trial
+              const trialEnd = new Date(sub.current_period_end * 1000)
+              const now = new Date()
+              const daysLeft = Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+              product.trialDaysLeft = daysLeft > 0 ? daysLeft : 0
+            }
+          }
+        })
+      }
+    } else {
+      console.warn('Failed to fetch subscriptions')
+    }
+  } catch (e) {
+    console.error('Error fetching subscriptions:', e)
+  } finally {
+    loadingSubscriptions.value = false
+  }
+}
+
+// Fetch User Data and Subscriptions
 onMounted(async () => {
   // Check for payment failure in URL
   const urlParams = new URLSearchParams(window.location.search)
@@ -36,25 +148,24 @@ onMounted(async () => {
   }
 
   try {
-    // Attempt to fetch real user data from backend
-    // Note: This assumes the backend is running on port 8173 and CORS is configured
+    // Fetch user data
     const response = await fetch('http://localhost:8173/v1/me', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-      // Important: Include cookies for authentication
       credentials: 'include'
     })
 
     if (response.ok) {
       const data = await response.json()
       user.value.email = data.email || user.value.email
-      // Create a name from email if not provided (since backend only sends email/role)
       user.value.name = data.email ? data.email.split('@')[0] : 'Admin User'
+
+      // Fetch subscriptions after user is loaded
+      await fetchSubscriptions()
     } else {
       console.warn('Failed to fetch user data, using mock')
-      // Fallback or redirect to signin if 401
       if (response.status === 401) {
          window.location.hash = '#/signin'
       }
@@ -63,56 +174,9 @@ onMounted(async () => {
     console.error('Error connecting to backend:', e)
     user.value.name = 'Demo User'
     user.value.email = 'demo@amorelabs.com'
+    loadingSubscriptions.value = false
   }
 })
-
-const handleBilling = async (productId: string) => {
-  // Redirect to backend billing endpoint to create Stripe session
-  // formatting the URL to point to the backend
-  const backendUrl = `http://localhost:8173/v1/billing/${productId}`
-
-  // We create a form and submit it to redirect the user
-  // This is often more reliable for redirects than fetch() if we expect a full page load
-  // (which Stripe Checkout is)
-  const form = document.createElement('form')
-  form.method = 'POST'
-  form.action = backendUrl
-  document.body.appendChild(form)
-  form.submit()
-}
-
-// Product Data
-const products = ref([
-  {
-    id: 'rinova',
-    name: 'Rinova AI',
-    description: 'Automated dispute resolution and revenue recovery.',
-    status: 'active',
-    renewalDate: 'Feb 24, 2026',
-    iconColor: 'text-blue-500',
-    bgColor: 'bg-blue-500/20',
-    borderColor: 'border-blue-500/30'
-  },
-  {
-    id: 'voice_ai_italy_outbound',
-    name: 'Outbound AI',
-    description: 'Logistics precision, OTIF management, and carrier negotiation.',
-    status: 'trial',
-    trialDaysLeft: 14,
-    iconColor: 'text-purple-500',
-    bgColor: 'bg-purple-500/20',
-    borderColor: 'border-purple-500/30'
-  },
-  {
-    id: 'voice_ai_italy_inbound',
-    name: 'Inbound AI',
-    description: 'Seamless ERP integration and supply chain ingestion.',
-    status: 'inactive',
-    iconColor: 'text-slate-500',
-    bgColor: 'bg-slate-500/10',
-    borderColor: 'border-slate-500/20'
-  }
-])
 </script>
 
 <template>
@@ -135,93 +199,74 @@ const products = ref([
 
         <!-- Product Cards Stack -->
         <div class="space-y-6">
-          <div v-for="product in products" :key="product.id" class="relative group">
-             <!-- Card Container (Dark Theme inspired by ManufacturingPowerSection) -->
-             <div class="relative rounded-[2rem] p-8 shadow-2xl border border-slate-800 overflow-hidden transition-transform duration-300 hover:scale-[1.01]"
-                  style="background: radial-gradient(circle at 0% 0%, #000000, #303030, #000000), linear-gradient(180deg, #505050, #000000); background-blend-mode: overlay, normal;">
+          <!-- Loading Skeleton -->
+          <div v-if="loadingSubscriptions" class="space-y-6">
+            <div v-for="i in 3" :key="i" class="relative rounded-[2rem] p-8 shadow-2xl border border-slate-800 overflow-hidden animate-pulse"
+                 style="background: radial-gradient(circle at 0% 0%, #000000, #303030, #000000), linear-gradient(180deg, #505050, #000000); background-blend-mode: overlay, normal;">
+              <div class="h-14 bg-slate-700/50 rounded-xl w-3/4"></div>
+              <div class="h-4 bg-slate-700/30 rounded mt-4 w-1/2"></div>
+            </div>
+          </div>
 
-                <!-- Background Grid -->
-                <div class="absolute inset-0 opacity-20 pointer-events-none"
-                     style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 24px 24px;">
-                </div>
+          <!-- Product Cards -->
+          <div v-else class="space-y-6">
+            <!-- Rinova AI Card -->
+            <div class="relative group" v-if="products[0]">
+              <ProductCard :product="products[0]" @activate="handleBilling" />
+            </div>
 
-                <!-- Content Grid -->
-                <div class="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+            <!-- Outbound AI Card -->
+            <div class="relative group" v-if="products[1]">
+              <ProductCard :product="products[1]" @activate="handleBilling" />
+            </div>
 
-                  <!-- Icon & Title -->
-                  <div class="md:col-span-5 flex items-start space-x-5">
-                    <div class="w-14 h-14 rounded-2xl flex-shrink-0 flex items-center justify-center border backdrop-blur-sm"
-                         :class="[product.bgColor, product.borderColor]">
-                       <!-- Simple Dynamic Icon based on name/color -->
-                       <svg v-if="product.id === 'rinova'" class="w-7 h-7" :class="product.iconColor" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                       </svg>
-                       <svg v-else-if="product.id === 'outbound'" class="w-7 h-7" :class="product.iconColor" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                       </svg>
-                       <svg v-else class="w-7 h-7" :class="product.iconColor" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-                       </svg>
+            <!-- Visual Connector with "Get Both" Button -->
+            <div class="relative flex flex-col items-center justify-center -my-6 z-20">
+              <!-- Vertical Connection Line -->
+              <div class="h-12 w-0.5 bg-gradient-to-b from-slate-800 via-purple-500/50 to-slate-800"></div>
+
+              <!-- Button in the middle -->
+              <div class="relative group/btn my-[-4px]">
+                <button
+                  @click="handleBilling('voice_ai_italy_outbound-inbound')"
+                  class="relative px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl shadow-xl transition-all duration-300 border border-purple-500/30 hover:border-purple-500 hover:scale-105 group-hover/btn:shadow-purple-500/20"
+                >
+                  <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl opacity-0 group-hover/btn:opacity-100 transition-opacity"></div>
+
+                  <div class="relative flex items-center gap-3">
+                    <!-- Icon -->
+                    <div class="p-1.5 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30">
+                      <svg class="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
                     </div>
-                    <div>
-                      <h3 class="text-2xl font-bold text-white mb-1">{{ product.name }}</h3>
-                      <p class="text-slate-400 text-sm leading-relaxed">{{ product.description }}</p>
+
+                    <div class="text-left">
+                      <div class="text-xs text-purple-300 font-medium">Bundle & Save</div>
+                      <div class="text-sm font-bold text-white">Get Both Agents</div>
+                    </div>
+
+                    <!-- Chevron -->
+                    <svg class="w-4 h-4 text-slate-500 group-hover/btn:text-white transition-colors ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+
+                    <!-- Badge -->
+                    <div class="absolute -top-3 -right-2 bg-gradient-to-r from-amber-400 to-orange-500 text-black text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg transform rotate-3 group-hover/btn:rotate-6 transition-transform">
+                      SAVE €€
                     </div>
                   </div>
+                </button>
+              </div>
 
-                  <!-- Spacer/Divider for Mobile -->
-                  <div class="hidden md:block md:col-span-1 border-r border-slate-700 h-12 mx-auto"></div>
+              <!-- Vertical Connection Line -->
+              <div class="h-12 w-0.5 bg-gradient-to-b from-slate-800 via-purple-500/50 to-slate-800"></div>
+            </div>
 
-                  <!-- Status -->
-                  <div class="md:col-span-3">
-                     <p class="text-xs text-slate-500 uppercase tracking-widest font-bold mb-2">Status</p>
-
-                     <div v-if="product.status === 'active'" class="flex items-center space-x-2">
-                        <span class="relative flex h-3 w-3">
-                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                          <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                        </span>
-                        <span class="text-white font-medium">Active Subscription</span>
-                     </div>
-
-                     <div v-else-if="product.status === 'trial'" class="flex items-center space-x-2">
-                        <span class="relative flex h-3 w-3">
-                          <span class="relative inline-flex rounded-full h-3 w-3 bg-purple-500"></span>
-                        </span>
-                        <span class="text-white font-medium">Free Trial</span>
-                     </div>
-
-                     <div v-else class="flex items-center space-x-2">
-                        <span class="h-3 w-3 rounded-full bg-slate-600"></span>
-                        <span class="text-slate-500 font-medium">Not Active</span>
-                     </div>
-                  </div>
-
-                  <!-- Details/Action -->
-                  <div class="md:col-span-3 text-right">
-                      <div v-if="product.status === 'active'">
-                        <p class="text-xs text-slate-500 mb-1">Renews on</p>
-                        <p class="text-white font-mono text-sm">{{ product.renewalDate }}</p>
-                        <button class="mt-3 text-xs text-slate-400 hover:text-white transition-colors">Manage Settings →</button>
-                      </div>
-
-                      <div v-else-if="product.status === 'trial'">
-                        <p class="text-xs text-slate-500 mb-1">Time Remaining</p>
-                        <p class="text-white font-bold text-lg">{{ product.trialDaysLeft }} Days</p>
-                        <button @click="handleBilling(product.id)" class="mt-2 bg-purple-600 hover:bg-purple-500 text-white text-xs px-4 py-2 rounded-full transition-colors font-bold">
-                          Upgrade Now
-                        </button>
-                      </div>
-
-                      <div v-else>
-                        <button @click="handleBilling(product.id)" class="border border-slate-600 hover:border-white text-slate-300 hover:text-white px-5 py-2 rounded-full text-sm transition-all">
-                          Activate
-                        </button>
-                      </div>
-                  </div>
-
-                </div>
-             </div>
+            <!-- Inbound AI Card -->
+            <div class="relative group" v-if="products[2]">
+              <ProductCard :product="products[2]" @activate="handleBilling" />
+            </div>
           </div>
         </div>
 
@@ -237,10 +282,17 @@ const products = ref([
       </div>
 
       <!-- User Info -->
-      <div class="flex flex-col">
+      <div class="flex flex-col mr-2">
         <span class="text-sm font-bold text-gray-900 leading-tight">{{ user.name }}</span>
         <span class="text-xs text-gray-500 leading-tight">{{ user.email }}</span>
       </div>
+
+      <!-- Sign Out Button -->
+      <button @click.stop="handleSignOut" class="ml-2 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-red-500 transition-colors" title="Sign Out">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+      </button>
     </div>
 
     <!-- Toast Notification -->

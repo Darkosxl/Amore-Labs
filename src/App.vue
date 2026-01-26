@@ -2,7 +2,6 @@
 import LandingPage from './components/LandingPage.vue'
 import SignIn from './components/SignIn.vue'
 import PaymentSuccess from './components/PaymentSuccess.vue'
-import PaymentFailure from './components/PaymentFailure.vue'
 import AdminConsole from './components/AdminConsole.vue'
 import { ref, computed, onMounted } from 'vue'
 
@@ -15,13 +14,12 @@ onMounted(() => {
 })
 
 const currentView = computed(() => {
-  switch (currentPath.value) {
+  const hash = currentPath.value.split('?')[0] // Remove query params for route matching
+  switch (hash) {
     case '#/signin':
       return SignIn
     case '#/success':
       return PaymentSuccess
-    case '#/failure':
-      return PaymentFailure
     case '#/admin_console':
       return AdminConsole
     default:
