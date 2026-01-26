@@ -43,11 +43,16 @@ const handleBilling = async (productId: string) => {
 }
 
 const handleSignOut = () => {
+  // Clear access_token cookie
+  document.cookie = 'access_token=; Max-Age=0; path=/; domain=' + window.location.hostname
+  // Also clear for localhost if current domain is different, just in case
+  document.cookie = 'access_token=; Max-Age=0; path=/;'
+
   // Clear any local storage if used
   localStorage.removeItem('user')
 
-  // Redirect to Backend Logout (which handles WorkOS logout)
-  window.location.href = 'http://localhost:8173/auth/logout'
+  // Redirect to Landing Page (root)
+  window.location.hash = ''
 }
 
 // Product Data - will be updated with real subscription info
