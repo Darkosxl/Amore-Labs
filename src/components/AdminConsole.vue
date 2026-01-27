@@ -65,8 +65,10 @@ const handleSignOut = () => {
   // Clear any local storage if used
   localStorage.removeItem('user')
 
-  // Redirect to Landing Page (root)
-  window.location.hash = ''
+  // Keep device authorization so they skip master key next time
+  // but redirect to backend logout to clear WorkOS session
+  // This allows signing in with a different account
+  window.location.href = `${API_URL}/auth/logout`
 }
 
 // Product Data - will be updated with real subscription info

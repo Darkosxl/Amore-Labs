@@ -9,23 +9,25 @@ import (
 )
 
 type Claims struct {
-	UserID string `json:"user_id"`
-	Email string `json:"email"`
-	Role string `json:"role"`
+	UserID       string   `json:"user_id"`
+	Email        string   `json:"email"`
+	Role         string   `json:"role"`
 	Entitlements []string `json:"entitlements"`
+	SessionID    string   `json:"session_id"` // WorkOS session ID for logout
 	jwt.RegisteredClaims
 }
 
-func GenerateToken(userid string, email string, role string, entitlements []string) (string, error) {
+func GenerateToken(userid string, email string, role string, entitlements []string, sessionID string) (string, error) {
 	claims := Claims{
-		UserID: userid,
-		Email: email,
-		Role: role,
+		UserID:       userid,
+		Email:        email,
+		Role:         role,
 		Entitlements: entitlements,
+		SessionID:    sessionID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 30)),
-			IssuedAt: jwt.NewNumericDate(time.Now()),
-			Issuer: "amorelabs",
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			Issuer:    "amorelabs",
 		},
 	}
 

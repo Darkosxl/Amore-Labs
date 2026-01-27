@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/workos/workos-go/v6/pkg/usermanagement"
 )
 
@@ -27,21 +28,42 @@ func LoginHandler(c *gin.Context) {
 }
 
 func LogoutHandler(c *gin.Context) {
-	// Clear the access token cookie
-	c.SetCookie("access_token", "", -1, "/", os.Getenv("COOKIE_DOMAIN"), false, true)
+	frontendUrl := os.Getenv("FRONTEND_URL")
+	returnTo := frontendUrl + "#/signin"
 
-	// Get WorkOS Logout URL
-	logoutUrl, err := usermanagement.GetLogoutURL(usermanagement.GetLogoutURLOpts{
-		SessionID: "", // We don't store the WorkOS session ID separately, relying on their side
-	})
-	
+	// Get the access token cookie to extract session ID
+	tokenString, err := c.Cookie("access_token")
 	if err != nil {
-		// Fallback if URL gen fails: just redirect to home
-		c.Redirect(http.StatusFound, os.Getenv("FRONTEND_URL"))
+		// No token, just redirect to signin
+		c.SetCookie("access_token", "", -1, "/", os.Getenv("COOKIE_DOMAIN"), false, true)
+		c.Redirect(http.StatusFound, returnTo)
 		return
 	}
 
-	// Redirect to WorkOS to end their session, then they will redirect back
+	// Parse our JWT to get the session ID
+	claims, err := mw.ValidateToken(tokenString)
+	if err != nil || claims.SessionID == "" {
+		// Can't get session ID, just clear cookie and redirect
+		c.SetCookie("access_token", "", -1, "/", os.Getenv("COOKIE_DOMAIN"), false, true)
+		c.Redirect(http.StatusFound, returnTo)
+		return
+	}
+
+	// Clear the access token cookie
+	c.SetCookie("access_token", "", -1, "/", os.Getenv("COOKIE_DOMAIN"), false, true)
+
+	// Get WorkOS Logout URL with session ID
+	logoutUrl, err := usermanagement.GetLogoutURL(usermanagement.GetLogoutURLOpts{
+		SessionID: claims.SessionID,
+	})
+
+	if err != nil {
+		// Fallback if URL gen fails: just redirect to signin
+		c.Redirect(http.StatusFound, returnTo)
+		return
+	}
+
+	// Redirect to WorkOS to end their session
 	c.Redirect(http.StatusFound, logoutUrl.String())
 }
 
@@ -57,8 +79,19 @@ func CallbackHandler(c *gin.Context){
 		return
 	}
 	
-	// Generate access token with empty entitlements (will be populated from WorkOS token)
-	accesstoken, err := mw.GenerateToken(user.User.ID, user.User.Email, "user", []string{})
+	// Extract session ID from WorkOS access token (it's in the 'sid' claim)
+	var sessionID string
+	token, _, err := jwt.NewParser().ParseUnverified(user.AccessToken, jwt.MapClaims{})
+	if err == nil {
+		if claims, ok := token.Claims.(jwt.MapClaims); ok {
+			if sid, ok := claims["sid"].(string); ok {
+				sessionID = sid
+			}
+		}
+	}
+
+	// Generate access token with empty entitlements and session ID for logout
+	accesstoken, err := mw.GenerateToken(user.User.ID, user.User.Email, "user", []string{}, sessionID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": "failed", "error": "Failed to generate token"})
 		return
