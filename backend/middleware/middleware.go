@@ -3,6 +3,7 @@ package middleware
 import (
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,22 +26,27 @@ func AuthMiddleware() gin.HandlerFunc {
 }
 
 func CORSMiddleware() gin.HandlerFunc {
+	allowedOriginsStr := os.Getenv("ALLOWED_ORIGINS")
+	allowedOrigins := strings.Split(allowedOriginsStr, ",")
+
 	return func(c *gin.Context) {
 		origin := c.Request.Header.Get("Origin")
-		frontendURL := os.Getenv("FRONTEND_URL")
 
-		// Allow configured frontend or localhost for dev, otherwise fall back to strict check
-		if origin == frontendURL || origin == "http://localhost:5173" {
+		// Check if origin is in allowed list
+		allowed := origin == "http://localhost:5173" // Always allow localhost for dev
+		for _, o := range allowedOrigins {
+			if origin == strings.TrimSpace(o) {
+				allowed = true
+				break
+			}
+		}
+
+		if allowed {
 			c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
-		} else {
-            // Default safe fallback if origin doesn't match
-             c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
-        }
-		
+		}
+
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, X-CSRF-Token, Authorization")
-		
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 
 		if c.Request.Method == "OPTIONS" {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -28,7 +29,8 @@ func LoginHandler(c *gin.Context) {
 }
 
 func LogoutHandler(c *gin.Context) {
-	frontendUrl := os.Getenv("FRONTEND_URL")
+	allowedOrigins := strings.Split(os.Getenv("ALLOWED_ORIGINS"), ",")
+	frontendUrl := strings.TrimSpace(allowedOrigins[0])
 	returnTo := frontendUrl + "#/signin"
 
 	// Get the access token cookie to extract session ID
@@ -96,7 +98,8 @@ func CallbackHandler(c *gin.Context){
 		c.JSON(http.StatusInternalServerError, gin.H{"status": "failed", "error": "Failed to generate token"})
 		return
 	}
-	frontendUrl := os.Getenv("FRONTEND_URL")
+	allowedOrigins := strings.Split(os.Getenv("ALLOWED_ORIGINS"), ",")
+	frontendUrl := strings.TrimSpace(allowedOrigins[0])
 	c.SetCookie("access_token", accesstoken, 86400, "/", os.Getenv("COOKIE_DOMAIN"), false, true)
 	c.Redirect(http.StatusFound, frontendUrl + "#/admin_console")
 	
